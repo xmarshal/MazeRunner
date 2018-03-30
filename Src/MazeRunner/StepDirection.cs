@@ -32,5 +32,10 @@
         /// Направление направо
         /// </summary>
         Right = 8,
+
+        /// <summary>
+        /// The all.
+        /// </summary>
+        All = Up | Down | Right | Left
     }
 }

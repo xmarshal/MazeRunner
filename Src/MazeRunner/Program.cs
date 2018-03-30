@@ -7,7 +7,7 @@
         private static readonly byte[,] Maze = 
             {
                 { 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-                { 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1 },
+                { 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1 },
                 { 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1 },
                 { 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1 },
                 { 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1 },
@@ -72,7 +72,7 @@
 
         public static void Main(string[] args)
         {
-            MazeRunner.PrintMaze(Maze);
+            MazeRunner.PrintMaze(Maze, Entry, Exit);
 
             Console.WriteLine();
 
@@ -83,7 +83,7 @@
                 Console.WriteLine("Длинка кратчайшего пути {0}", path.Count - 1);
                 Console.WriteLine();
 
-                MazeRunner.PrintPath(Maze, path);
+                MazeRunner.PrintMaze(Maze, Entry, Exit, path);
             }
             else
             {

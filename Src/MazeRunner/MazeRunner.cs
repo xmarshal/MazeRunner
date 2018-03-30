@@ -30,13 +30,13 @@
 
             while (true)
             {
-                var exitCell = steps.FirstOrDefault(s => s.Equals(exit));
+                var exitCell = steps.FirstOrDefault(s => s == exit);
                 if (exitCell != null)
                 {
                     return exitCell;
                 }
 
-                steps = steps.SelectMany(s => s.GetSteps(maze)).ToList();
+                steps = steps.SelectMany(s => s.GetSteps(maze)).Distinct().ToList();
 
                 if (steps.Any())
                 {
@@ -68,16 +68,18 @@
 
             while (true)
             {
-                var newSteps = new List<MazeCell>();
+                var newSteps = new HashSet<MazeCell>();
                 foreach (var step in steps)
                 {
-                    if (step.Equals(exit))
+                    if (step == exit)
                     {
                         return step;
                     }
 
-                    var cells = step.GetSteps(maze);
-                    newSteps.AddRange(cells);
+                    foreach (var cell in step.GetSteps(maze))
+                    {
+                        newSteps.Add(cell);
+                    }
                 }
 
                 if (!newSteps.Any())
@@ -95,32 +97,16 @@
         /// <param name="maze">
         /// Лабиринт.
         /// </param>
-        public static void PrintMaze(byte[,] maze)
-        {
-            var m = maze.GetLength(0);
-            var n = maze.GetLength(1);
-
-            for (int i = 0; i < m; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    Console.Write($" {maze[i, j]}");
-                }
-
-                Console.WriteLine();
-            }
-        }
-
-        /// <summary>
-        /// Напечатать путь в лабиринте.
-        /// </summary>
-        /// <param name="maze">
-        /// Лабиринт.
+        /// <param name="entry">
+        /// Точка входа в лабиринт.
+        /// </param>
+        /// <param name="exit">
+        /// Точка выхода из лабиринта.
         /// </param>
         /// <param name="path">
         /// Путь.
         /// </param>
-        public static void PrintPath(byte[,] maze, ICollection<MazeCell> path)
+        public static void PrintMaze(byte[,] maze, MazeCell entry, MazeCell exit, IReadOnlyCollection<MazeCell> path = null)
         {
             var color = Console.ForegroundColor;
 
@@ -133,12 +119,19 @@
                 {
                     var cell = new MazeCell(i, j);
 
-                    if (path.Contains(cell))
+                    if (path != null && path.Contains(cell))
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                     }
 
-                    Console.Write($" {maze[i, j]}");
+                    if (cell == entry || cell == exit)
+                    {
+                        Console.Write(" x");
+                    }
+                    else
+                    {
+                        Console.Write($" {maze[i, j]}");
+                    }
 
                     Console.ForegroundColor = color;
                 }

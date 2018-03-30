@@ -25,17 +25,10 @@
         /// <param name="previousStep">
         /// Предыдущий шаг в данном пути
         /// </param>
-        /// <param name="allowedDirections">
-        /// Допустимые направления движения
-        /// </param>
-        public MazeCell(int x,
-                        int y,
-                        [CanBeNull] MazeCell previousStep = null,
-                        StepDirection allowedDirections = Up | Down | Left | Right)
+        public MazeCell(int x, int y, [CanBeNull] MazeCell previousStep = null)
         {
             this.X = x;
             this.Y = y;
-            this.AllowedDirections = allowedDirections;
             this.PreviousStep = previousStep;
         }
 
@@ -50,14 +43,58 @@
         public int Y { get; }
 
         /// <summary>
-        /// Допустимые направления для движения из данной клетки.
-        /// </summary>
-        public StepDirection AllowedDirections { get; }
-
-        /// <summary>
         /// Предыдущий шаг в данном пути.
         /// </summary>
         public MazeCell PreviousStep { get; }
+
+        /// <summary>
+        /// Оператор ==.
+        /// </summary>
+        /// <param name="c1">
+        /// Левый операнд сравнения.
+        /// </param>
+        /// <param name="c2">
+        /// Правый операнд сравнения.
+        /// </param>
+        /// <returns>
+        /// true если ссылки на клетки идентичны или координаты клеток совпадают, иначе false
+        /// </returns>
+        public static bool operator ==(MazeCell c1, MazeCell c2)
+        {
+            if (ReferenceEquals(c1, c2))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(c1, null))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(null, c2))
+            {
+                return false;
+            }
+
+            return c1.X == c2.X && c1.Y == c2.Y;
+        }
+
+        /// <summary>
+        /// Оператор !=.
+        /// </summary>
+        /// <param name="c1">
+        /// Левый операнд сравнения.
+        /// </param>
+        /// <param name="c2">
+        /// Правый операнд сравнения.
+        /// </param>
+        /// <returns>
+        /// true если ссылки клетки не равны, иначе false
+        /// </returns>
+        public static bool operator !=(MazeCell c1, MazeCell c2)
+        {
+            return !(c1 == c2);
+        }
 
         /// <summary>
         /// Получить строковое представление пройденного пути.
@@ -100,7 +137,7 @@
         /// <returns>
         /// Список клеток в которые возможно осуществить шаг из данной.
         /// </returns>
-        public List<MazeCell> GetSteps(byte[,] maze)
+        public IEnumerable<MazeCell> GetSteps(byte[,] maze)
         {
             var steps = new[]
                 {
@@ -110,7 +147,7 @@
                     this.StepTo(maze, Up)
                 };
 
-            var cells = steps.Where(s => s != null).ToList();
+            var cells = steps.Where(s => s != null);
 
             maze[this.X, this.Y] = 1;
 
@@ -132,15 +169,9 @@
         [CanBeNull]
         public MazeCell StepTo(byte[,] maze, StepDirection direction)
         {
-            if ((this.AllowedDirections & direction) == 0)
-            {
-                return null;
-            }
-
             var x = this.X;
             var y = this.Y;
-
-            var inRange = false;
+            bool inRange;
             switch (direction)
             {
                 case Up:
@@ -159,11 +190,13 @@
                     y += 1;
                     inRange = y < maze.GetLength(1);
                     break;
+                default:
+                    return null;
             }
 
             if (inRange && maze[x, y] == 0)
             {
-                return new MazeCell(x, y, this, ~direction | direction);
+                return new MazeCell(x, y, this);
             }
 
             return null;
@@ -178,7 +211,7 @@
         /// <inheritdoc />
         public bool Equals(MazeCell other)
         {
-            if (ReferenceEquals(other, null))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
@@ -194,7 +227,7 @@
         /// <inheritdoc />
         public override bool Equals(object other)
         {
-            if (other is null)
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
